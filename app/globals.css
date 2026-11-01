@@ -1,26 +1,304 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --kn-brown-dark: #3b1f1a;
+  --kn-brown: #5c3a2e;
+  --kn-brown-medium: #6f4e37;
+  --kn-brown-light: #a67c52;
+  --kn-gold: #c8a97e;
+  --kn-cream: #f5f0e8;
+  --kn-cream-dark: #ebe3d5;
+  --kn-white: #fffdf9;
+  --kn-text: #3b2f2f;
+  --kn-text-muted: #7a6b6b;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--kn-text);
+  background-color: var(--kn-white);
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.kn-text-primary {
+  color: var(--kn-brown-medium) !important;
+}
+
+.kn-heading {
+  color: var(--kn-brown-dark);
+  position: relative;
+  display: inline-block;
+}
+
+.kn-heading::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--kn-gold);
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+.kn-navbar {
+  background-color: var(--kn-brown-dark) !important;
+}
+
+.kn-navbar .navbar-brand {
+  color: var(--kn-gold) !important;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.kn-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  margin: 0 5px;
+}
+
+.kn-navbar .nav-link:hover,
+.kn-navbar .nav-link.active {
+  color: var(--kn-gold) !important;
+}
+
+.kn-navbar .navbar-toggler {
+  border-color: var(--kn-gold);
+}
+
+.kn-carousel-item {
+  height: 85vh;
+  min-height: 400px;
+  position: relative;
+}
+
+.kn-carousel-item img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.kn-carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(59, 31, 26, 0.6),
+    rgba(59, 31, 26, 0.85)
+  );
+}
+
+a.kn-btn-primary {
+  background-color: var(--kn-gold);
+  color: var(--kn-brown-dark);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+a.kn-btn-primary:hover {
+  background-color: var(--kn-brown-light);
+  color: var(--kn-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(200, 169, 126, 0.4);
+}
+
+button.kn-btn-primary {
+  background-color: var(--kn-gold);
+  color: var(--kn-brown-dark);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button.kn-btn-primary:hover {
+  background-color: var(--kn-brown-light);
+  color: var(--kn-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(200, 169, 126, 0.4);
+}
+
+a.kn-btn-primary-full {
+  background-color: var(--kn-gold);
+  color: var(--kn-brown-dark);
+  border: none;
+  font-weight: 800;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+a.kn-btn-primary-full:hover {
+  background-color: var(--kn-brown-light);
+  color: var(--kn-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(200, 169, 126, 0.4);
+}
+
+.kn-section-menu {
+  background-color: var(--kn-cream);
+}
+
+.kn-card {
+  background-color: var(--kn-white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.kn-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(92, 58, 46, 0.15) !important;
+}
+
+.kn-card-img {
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.kn-card:hover .kn-card-img {
+  transform: scale(1.05);
+}
+
+.kn-card .card-title {
+  color: var(--kn-brown-dark);
+}
+
+.kn-card-static {
+  background-color: var(--kn-white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.kn-card-static .card-title {
+  color: var(--kn-brown-dark);
+}
+
+.kn-price {
+  color: var(--kn-brown-medium);
+  font-size: 1.2rem;
+}
+
+.kn-section-tentang {
+  background-color: var(--kn-white);
+}
+
+.kn-stat-box {
+  min-width: 100px;
+  border: 1px solid var(--kn-cream-dark);
+}
+
+.kn-section-faq {
+  background-color: var(--kn-cream);
+}
+
+.kn-accordion .accordion-item {
+  background-color: var(--kn-white);
+  border: 1px solid var(--kn-cream-dark) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.kn-accordion-btn {
+  background-color: var(--kn-white) !important;
+  color: var(--kn-brown-dark) !important;
+  font-weight: 600;
+  box-shadow: none !important;
+  transition: all 0.3s ease;
+}
+
+.kn-accordion-btn:not(.collapsed) {
+  background-color: var(--kn-gold) !important;
+  color: var(--kn-brown-dark) !important;
+  font-weight: 700;
+}
+
+.kn-accordion-btn::after {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(15%) saturate(1500%) hue-rotate(340deg);
+  transition: transform 0.3s ease;
+}
+
+.kn-accordion-btn:not(.collapsed)::after {
+  filter: brightness(0) saturate(100%) invert(23%) sepia(85%) saturate(1500%) hue-rotate(340deg);
+}
+
+.accordion-body {
+  background-color: #faf6f0 !important;
+  color: var(--kn-text-muted);
+  transition: all 0.3s ease;
+}
+
+.kn-accordion-btn:hover {
+  background-color: var(--kn-cream) !important;
+}
+
+.kn-accordion-btn:not(.collapsed):hover {
+  background-color: var(--kn-gold) !important;
+}
+
+.kn-footer {
+  background-color: var(--kn-brown-dark);
+}
+
+.kn-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--kn-gold);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.kn-social-icon:hover {
+  background-color: var(--kn-gold);
+  color: var(--kn-brown-dark);
+  transform: translateY(-3px);
+}
+
+.kn-modal-content {
+  background-color: var(--kn-white);
+}
+
+.kn-modal-content .modal-title {
+  color: var(--kn-brown-dark);
+}
+
+@media (max-width: 767.98px) {
+  .kn-carousel-item {
+    height: 60vh;
+    min-height: 350px;
+  }
+
+  .kn-carousel-overlay h1 {
+    font-size: 1.8rem;
+  }
+
+  .kn-carousel-overlay .lead {
+    font-size: 1rem;
+  }
+
+  .kn-card-img {
+    height: 180px;
+  }
+
+  .kn-stat-box {
+    min-width: 80px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .kn-carousel-item {
+    height: 70vh;
+  }
 }

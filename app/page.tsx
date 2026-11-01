@@ -1,69 +1,117 @@
-import Image from "next/image";
+import TopNavbar from "./component/topnavbar";
+import WebFooter from "./component/webfooter";
+import TheCarousel from "./component/thecarousel";
+
+export const instant = false;
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+    <TopNavbar />
+    <TheCarousel />
+    {/* BLANK */}
+    <section id="tentang" className="py-5 kn-section-tentang">
+      <div className="container">
+        <div className="row align-items-center g-5">
+          <div className="col-12 col-lg-6 text-center">
+            <img src="img/about.jpg" alt="Tentang Ketoprak Nusantara" className="img-fluid rounded-4 shadow" />
+          </div>
+          <div className="col-12 col-lg-6">
+            <h2 className="fw-bold kn-heading mb-3">Tentang Ketoprak Nusantara</h2>
+            <p className="text-muted mb-3">
+              <strong>Ketoprak</strong> adalah salah satu kuliner khas Indonesia yang lahir dari kesederhanaan dan kaya akan cita rasa. Di Ketoprak Nusantara, kami menghadirkan sajian ini dengan perhatian pada kualitas bahan, keseimbangan rasa, dan pengalaman menikmati makanan.
+            </p>
+            <p className="text-muted mb-4">
+              Mulai dari tahu yang lembut, tauge segar, bihun, lontong, hingga saus kacang khas yang menjadi karakter utama—setiap elemen dipersiapkan untuk menciptakan rasa yang familiar sekaligus berkesan.
+            </p>
+            <div className="d-flex gap-3 flex-wrap">
+              <div className="text-center p-3 bg-white rounded-3 shadow-sm kn-stat-box">
+                <h4 className="fw-bold kn-text-primary mb-0">#1</h4>
+                <small className="text-muted">Resto seluruh Indonesia</small>
+              </div>
+              <div className="text-center p-3 bg-white rounded-3 shadow-sm kn-stat-box">
+                <h4 className="fw-bold kn-text-primary mb-0">50+</h4>
+                <small className="text-muted">Branch</small>
+              </div>
+              <div className="text-center p-3 bg-white rounded-3 shadow-sm kn-stat-box">
+                <h4 className="fw-bold kn-text-primary mb-0">4.8</h4>
+                <small className="text-muted">Rating</small>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+    </section>
+
+    <section id="faq" className="py-5 kn-section-faq">
+      <div className="container">
+        <div className="text-center mb-5">
+          <h2 className="fw-bold kn-heading">Pertanyaan yang Sering Diajukan</h2>
+          <p className="text-muted">Temukan jawaban untuk pertanyaan umum seputar Kopi Nusantara</p>
         </div>
-      </main>
-    </div>
+
+        <div className="row justify-content-center">
+          <div className="col-12 col-lg-8">
+            <div className="accordion kn-accordion" id="faqAccordion">
+
+              <div className="accordion-item border-0 mb-3 rounded-3 overflow-hidden shadow-sm">
+                <h2 className="accordion-header">
+                  <button className="accordion-button kn-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
+                    MISSING TABLE STRING ENTRY
+                  </button>
+                </h2>
+                <div id="faq1" className="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                  <div className="accordion-body text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </div>
+                </div>
+              </div>
+
+              <div className="accordion-item border-0 mb-3 rounded-3 overflow-hidden shadow-sm">
+                <h2 className="accordion-header">
+                  <button className="accordion-button kn-accordion-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                    MISSING TABLE STRING ENTRY
+                  </button>
+                </h2>
+                <div id="faq2" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div className="accordion-body text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </div>
+                </div>
+              </div>
+
+              <div className="accordion-item border-0 mb-3 rounded-3 overflow-hidden shadow-sm">
+                <h2 className="accordion-header">
+                  <button className="accordion-button kn-accordion-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                    MISSING TABLE STRING ENTRY
+                  </button>
+                </h2>
+                <div id="faq3" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div className="accordion-body text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </div>
+                </div>
+              </div>
+
+              <div className="accordion-item border-0 mb-3 rounded-3 overflow-hidden shadow-sm">
+                <h2 className="accordion-header">
+                  <button className="accordion-button kn-accordion-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
+                    MISSING TABLE STRING ENTRY
+                  </button>
+                </h2>
+                <div id="faq4" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div className="accordion-body text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <WebFooter />
+    </>
   );
 }

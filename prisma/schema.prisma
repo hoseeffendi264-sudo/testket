@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum Category {
+  food
+  drink
+}
+
+enum OrderType {
+  dine_in
+  takeaway
+}
+
+enum OrderStatus {
+  pending
+  cooking
+  ready
+  done
+  cancelled
+}
+
+enum PayMethod {
+  cash
+  qris
+  transfer
+}
+
+enum PayStatus {
+  unpaid
+  paid
+  failed
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  pass      String
+  role      Role     @default(user)
+  createdAt DateTime @default(now()) @map("created_at")
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Menu {
+  id         Int         @id @default(autoincrement())
+  name       String
+  cat        Category
+  descr      String      @default("")
+  price      Int
+  img        String
+  avail      Boolean     @default(true)
+  orderItems OrderItem[]
+
+  @@map("menu")
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  userId    Int         @map("user_id")
+  type      OrderType
+  tbl       String?
+  status    OrderStatus @default(pending)
+  total     Int         @default(0)
+  note      String      @default("")
+  createdAt DateTime    @default(now()) @map("created_at")
+  user      User        @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  payment   Payment?
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id      Int   @id @default(autoincrement())
+  orderId Int   @map("order_id")
+  menuId  Int   @map("menu_id")
+  qty     Int
+  price   Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menu    Menu  @relation(fields: [menuId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id      Int       @id @default(autoincrement())
+  orderId Int       @unique @map("order_id")
+  method  PayMethod
+  amount  Int
+  status  PayStatus @default(unpaid)
+  paidAt  DateTime? @map("paid_at")
+  order   Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
