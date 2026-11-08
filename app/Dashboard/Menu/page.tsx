@@ -60,7 +60,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ o
   await needAdmin();
   const q = await searchParams;
   const all = await prisma.menu.findMany({ orderBy: { id: "asc" } });
-  const ms = [...all.filter((m) => m.cat === "food"), ...all.filter((m) => m.cat === "drink")] as M[];
+  const ms: M[] = all.filter((m) => m.cat === "food").concat(all.filter((m) => m.cat === "drink"));
 
   return (
     <>

@@ -9,7 +9,6 @@ import { cartOp, placeOrder } from "@/lib/actions";
 
 export const instant = false;
 
-type Item = { id: number; name: string; price: number; img: string };
 type Line = { name: string; qty: number; price: number };
 type Ord = { id: number; type: string; tbl: string | null; status: string; total: number; note: string; method: string; pay: string };
 
@@ -30,12 +29,20 @@ const pname: Record<string, string> = { unpaid: "Belum dibayar", paid: "Lunas", 
 async function Done({ id, uid }: { id: number; uid: number }) {
   const row = await prisma.order.findFirst({ where: { id, userId: uid }, include: { payment: true } });
   if (!row || !row.payment) redirect("/Payment");
+
   const o: Ord = {
-    id: row.id, type: row.type, tbl: row.tbl, status: row.status, total: row.total, note: row.note,
-    method: row.payment.method, pay: row.payment.status,
+    id: row.id,
+    type: row.type,
+    tbl: row.tbl,
+    status: row.status,
+    total: row.total,
+    note: row.note,
+    method: row.payment.method,
+    pay: row.payment.status,
   };
-  const ls = (await prisma.orderItem.findMany({ where: { orderId: id }, include: { menu: { select: { name: true } } }, orderBy: { id: "asc" } }))
-    .map((i) => ({ name: i.menu.name, qty: i.qty, price: i.price })) as Line[];
+
+  const rows = await prisma.orderItem.findMany({ where: { orderId: id }, include: { menu: true }, orderBy: { id: "asc" } });
+  const ls: Line[] = rows.map((i) => ({ name: i.menu.name, qty: i.qty, price: i.price }));
 
   return (
     <section className="py-5 kn-section-menu min-vh-100">
@@ -95,7 +102,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ o
   const c = session.cart ?? {};
   const ids = Object.keys(c).map(Number);
   const items = ids.length
-    ? ((await prisma.menu.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, price: true, img: true }, orderBy: { id: "asc" } })) as Item[])
+    ? await prisma.menu.findMany({ where: { id: { in: ids } }, orderBy: { id: "asc" } })
     : [];
   const total = items.reduce((t, m) => t + m.price * c[m.id], 0);
 

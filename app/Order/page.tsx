@@ -68,7 +68,7 @@ export default async function Home() {
   if (!session.isLoggedIn || !session.userId) redirect("/Login");
   if (session.role == "admin") redirect("/Dashboard");
 
-  const ms = (await prisma.menu.findMany({ where: { avail: true }, orderBy: { id: "asc" } })) as M[];
+  const ms: M[] = await prisma.menu.findMany({ where: { avail: true }, orderBy: { id: "asc" } });
   const food = ms.filter((m) => m.cat === "food");
   const drink = ms.filter((m) => m.cat === "drink");
 

@@ -33,8 +33,6 @@ export default function WebFooter() {
                     </div>
                 </div>
             </div>
-                <hr className="border-secondary my-4" />
-                <p className="text-center text-white-50 small mb-0">&copy; 2026 Ketoprak Nusantara. All rights reserved.</p>
             </div>
         </footer>
     );

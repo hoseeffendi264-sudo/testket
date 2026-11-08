@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { listOrderLines, listOrders } from "@/lib/queries";
-import type { OrderStatus } from "@/lib/generated/prisma/client";
 import { needAdmin } from "@/lib/admin";
 import { setStatus } from "@/lib/admin-actions";
 import { AdminNav, PBadge, SBadge, mname, rp, sname, tname } from "../ui";
@@ -17,10 +16,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const q = await searchParams;
   const f = q.s && tabs.includes(q.s) ? q.s : "";
 
-  const os = (await listOrders((f || undefined) as OrderStatus | undefined)) as O[];
-  const ls = (await listOrderLines(os.map((o) => o.id))) as L[];
+  const os: O[] = await listOrders(f);
+  const ls: L[] = await listOrderLines(os.map((o) => o.id));
   const by: Record<number, L[]> = {};
-  for (const l of ls) (by[l.order_id] ??= []).push(l);
+  for (const l of ls) {
+    if (!by[l.order_id]) by[l.order_id] = [];
+    by[l.order_id].push(l);
+  }
   const back = "/Dashboard/Orders" + (f ? `?s=${f}` : "");
 
   return (

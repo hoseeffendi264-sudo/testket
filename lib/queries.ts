@@ -2,35 +2,38 @@ import "server-only";
 import { prisma } from "./db";
 import type { OrderStatus, PayStatus } from "./generated/prisma/client";
 
-// Format "dd/MM HH:mm" dalam zona waktu WIB (sama seperti strftime +7 hours di SQLite)
-const wib = new Intl.DateTimeFormat("id-ID", {
-  timeZone: "Asia/Jakarta",
-  day: "2-digit",
-  month: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-export function fmt(d: Date | null | undefined) {
+function pad(n: number) {
+  return n < 10 ? "0" + n : String(n);
+}
+
+export function fmt(d: Date | null) {
   if (!d) return null;
-  const p = Object.fromEntries(wib.formatToParts(d).map((x) => [x.type, x.value]));
-  return `${p.day}/${p.month} ${p.hour}:${p.minute}`;
+  const w = new Date(d.getTime() + 7 * 3600 * 1000);
+  return pad(w.getUTCDate()) + "/" + pad(w.getUTCMonth() + 1) + " " + pad(w.getUTCHours()) + ":" + pad(w.getUTCMinutes());
 }
 
-// Awal hari ini (00:00 WIB) dalam UTC
-function startOfTodayWIB() {
-  const wibNow = new Date(Date.now() + 7 * 3600 * 1000);
-  const d = Date.UTC(wibNow.getUTCFullYear(), wibNow.getUTCMonth(), wibNow.getUTCDate());
-  return new Date(d - 7 * 3600 * 1000);
+function awalHari() {
+  const w = new Date(Date.now() + 7 * 3600 * 1000);
+  const t = Date.UTC(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate());
+  return new Date(t - 7 * 3600 * 1000);
 }
 
-export async function listOrders(status?: OrderStatus) {
+export function imgSrc(img: string) {
+  if (img.startsWith("http")) return img;
+  return "/" + img;
+}
+
+export async function listOrders(status?: string) {
+  const where: { status?: OrderStatus } = {};
+  if (status) where.status = status as OrderStatus;
+
   const rows = await prisma.order.findMany({
-    where: status ? { status } : undefined,
-    include: { user: { select: { email: true } }, payment: true },
+    where,
+    include: { user: true, payment: true },
     orderBy: { id: "desc" },
     take: 100,
   });
+
   return rows.map((o) => ({
     id: o.id,
     type: o.type as string,
@@ -46,22 +49,28 @@ export async function listOrders(status?: OrderStatus) {
 }
 
 export async function listOrderLines(ids: number[]) {
-  if (!ids.length) return [];
+  if (ids.length === 0) return [];
+
   const rows = await prisma.orderItem.findMany({
     where: { orderId: { in: ids } },
-    include: { menu: { select: { name: true } } },
+    include: { menu: true },
     orderBy: { id: "asc" },
   });
+
   return rows.map((i) => ({ order_id: i.orderId, name: i.menu.name, qty: i.qty }));
 }
 
-export async function listPayments(status?: PayStatus) {
+export async function listPayments(status?: string) {
+  const where: { status?: PayStatus } = {};
+  if (status) where.status = status as PayStatus;
+
   const rows = await prisma.payment.findMany({
-    where: status ? { status } : undefined,
-    include: { order: { include: { user: { select: { email: true } } } } },
+    where,
+    include: { order: { include: { user: true } } },
     orderBy: { orderId: "desc" },
     take: 100,
   });
+
   return rows.map((p) => ({
     id: p.orderId,
     status: p.order.status as string,
@@ -75,28 +84,50 @@ export async function listPayments(status?: PayStatus) {
 }
 
 export async function dashboardStats() {
-  const since = startOfTodayWIB();
-  const [od, rv, ac, up, all, rc, grp] = await Promise.all([
-    prisma.order.count({ where: { createdAt: { gte: since }, status: { not: "cancelled" } } }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", paidAt: { gte: since } } }),
-    prisma.order.count({ where: { status: { in: ["pending", "cooking", "ready"] } } }),
-    prisma.payment.aggregate({
-      _sum: { amount: true },
-      _count: true,
-      where: { status: "unpaid", order: { status: { not: "cancelled" } } },
-    }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid" } }),
-    listOrders().then((r) => r.slice(0, 8)),
-    prisma.orderItem.groupBy({
-      by: ["menuId"],
-      _sum: { qty: true },
-      where: { order: { status: { not: "cancelled" } } },
-      orderBy: [{ _sum: { qty: "desc" } }, { menuId: "asc" }],
-      take: 5,
-    }),
-  ]);
-  const names = await prisma.menu.findMany({ where: { id: { in: grp.map((g) => g.menuId) } }, select: { id: true, name: true } });
-  const nm = new Map(names.map((m) => [m.id, m.name]));
+  const since = awalHari();
+
+  const od = await prisma.order.count({
+    where: { createdAt: { gte: since }, status: { not: "cancelled" } },
+  });
+
+  const rv = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { status: "paid", paidAt: { gte: since } },
+  });
+
+  const ac = await prisma.order.count({
+    where: { status: { in: ["pending", "cooking", "ready"] } },
+  });
+
+  const up = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    _count: true,
+    where: { status: "unpaid", order: { status: { not: "cancelled" } } },
+  });
+
+  const all = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { status: "paid" },
+  });
+
+  const rc = (await listOrders()).slice(0, 8);
+
+  const grp = await prisma.orderItem.groupBy({
+    by: ["menuId"],
+    _sum: { qty: true },
+    where: { order: { status: { not: "cancelled" } } },
+    orderBy: [{ _sum: { qty: "desc" } }, { menuId: "asc" }],
+    take: 5,
+  });
+  const menus = await prisma.menu.findMany({
+    where: { id: { in: grp.map((g) => g.menuId) } },
+  });
+  const top = [];
+  for (const g of grp) {
+    const m = menus.find((x) => x.id === g.menuId);
+    top.push({ name: m ? m.name : "-", q: g._sum.qty ?? 0 });
+  }
+
   return {
     od,
     rv: rv._sum.amount ?? 0,
@@ -105,9 +136,6 @@ export async function dashboardStats() {
     upT: up._sum.amount ?? 0,
     all: all._sum.amount ?? 0,
     rc,
-    top: grp.map((g) => ({ name: nm.get(g.menuId) ?? "?", q: g._sum.qty ?? 0 })),
+    top,
   };
 }
-
-// Lokasi gambar: URL penuh (Vercel Blob) atau path lokal di /public
-export const imgSrc = (img: string) => (img.startsWith("http") ? img : `/${img}`);

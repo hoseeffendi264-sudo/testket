@@ -4,8 +4,13 @@ import { PrismaClient } from "./generated/prisma/client";
 
 const g = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma =
-  g.prisma ??
-  (g.prisma = new PrismaClient({
-    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
-  }));
+function buat() {
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  return new PrismaClient({ adapter });
+}
+
+export const prisma = g.prisma ?? buat();
+
+if (process.env.NODE_ENV !== "production") {
+  g.prisma = prisma;
+}

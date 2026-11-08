@@ -1,45 +1,54 @@
 import { config } from "dotenv";
-config({ path: [".env.local", ".env"] });
 import { randomBytes, scryptSync } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL! }),
-});
+config({ path: [".env.local", ".env"] });
 
-const hash = (p: string) => {
+const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
+
+function hash(p: string) {
   const s = randomBytes(16).toString("hex");
   return s + ":" + scryptSync(p, s, 64).toString("hex");
-};
+}
 
 async function main() {
-  await prisma.user.upsert({
-    where: { email: "admin@ketoprak.com" },
-    update: {},
-    create: { email: "admin@ketoprak.com", pass: hash("Admin123!"), role: "admin" },
-  });
-  await prisma.user.upsert({
-    where: { email: "user@ketoprak.com" },
-    update: {},
-    create: { email: "user@ketoprak.com", pass: hash("User123!"), role: "user" },
-  });
-
-  if ((await prisma.menu.count()) === 0) {
-    await prisma.menu.createMany({
-      data: [
-        { name: "Ketoprak Original", cat: "food", price: 18000, img: "img/food/ketoprak-original.jpg" },
-        { name: "Ketoprak Jumbo", cat: "food", price: 23000, img: "img/food/ketoprak-jumbo.jpg" },
-        { name: "Ketoprak Telur", cat: "food", price: 18000, img: "img/food/ketoprak-telur.jpg" },
-        { name: "Ketoprak Nusantara", cat: "food", price: 21000, img: "img/food/ketoprak-nusantara.jpg" },
-        { name: "Ketoprak Komplit", cat: "food", price: 21000, img: "img/food/ketoprak-komplit.jpg" },
-        { name: "Air Mineral", cat: "drink", price: 5000, img: "img/drink/air-mineral.jpg" },
-        { name: "Teh Manis", cat: "drink", price: 5000, img: "img/drink/teh-manis.jpg" },
-        { name: "Lemonade", cat: "drink", price: 6000, img: "img/drink/lemonade.jpg" },
-        { name: "Yum-Soda", cat: "drink", price: 8000, img: "img/drink/yum-soda.jpg" },
-        { name: "Kopi Nusantara", cat: "drink", price: 8000, img: "img/drink/kopi-nusantara.jpg" },
-      ],
+  const akun = [
+    { email: "admin@ketoprak.com", pass: "Admin123!", role: "admin" as const },
+    { email: "user@ketoprak.com", pass: "User123!", role: "user" as const },
+  ];
+  for (const a of akun) {
+    await prisma.user.upsert({
+      where: { email: a.email },
+      update: {},
+      create: { email: a.email, pass: hash(a.pass), role: a.role },
     });
+  }
+
+  const n = await prisma.menu.count();
+  if (n > 0) return;
+
+  const food = [
+    ["Ketoprak Original", 18000, "ketoprak-original"],
+    ["Ketoprak Jumbo", 23000, "ketoprak-jumbo"],
+    ["Ketoprak Telur", 18000, "ketoprak-telur"],
+    ["Ketoprak Nusantara", 21000, "ketoprak-nusantara"],
+    ["Ketoprak Komplit", 21000, "ketoprak-komplit"],
+  ] as const;
+  const drink = [
+    ["Air Mineral", 5000, "air-mineral"],
+    ["Teh Manis", 5000, "teh-manis"],
+    ["Lemonade", 6000, "lemonade"],
+    ["Yum-Soda", 8000, "yum-soda"],
+    ["Kopi Nusantara", 8000, "kopi-nusantara"],
+  ] as const;
+
+  for (const f of food) {
+    await prisma.menu.create({ data: { name: f[0], cat: "food", price: f[1], img: "img/food/" + f[2] + ".jpg" } });
+  }
+  for (const d of drink) {
+    await prisma.menu.create({ data: { name: d[0], cat: "drink", price: d[1], img: "img/drink/" + d[2] + ".jpg" } });
   }
 }
 

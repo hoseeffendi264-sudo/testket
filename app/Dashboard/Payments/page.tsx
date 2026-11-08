@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { listPayments } from "@/lib/queries";
-import type { PayStatus } from "@/lib/generated/prisma/client";
 import { needAdmin } from "@/lib/admin";
 import { setPay } from "@/lib/admin-actions";
 import { AdminNav, PBadge, SBadge, mname, pname, rp } from "../ui";
@@ -16,7 +15,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const q = await searchParams;
   const f = q.s && tabs.includes(q.s) ? q.s : "";
 
-  const ps = (await listPayments((f || undefined) as PayStatus | undefined)) as P[];
+  const ps: P[] = await listPayments(f);
   const back = "/Dashboard/Payments" + (f ? `?s=${f}` : "");
 
   const acts: [string, string, string][] = [
