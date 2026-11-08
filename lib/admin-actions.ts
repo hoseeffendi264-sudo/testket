@@ -25,7 +25,7 @@ async function photo(f: FormDataEntryValue | null, cat: string, name: string) {
   if (!slug) slug = "menu";
   const fn = slug + "-" + Date.now() + "." + ext;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
     const b = await put("img/" + cat + "/" + fn, f, { access: "public" });
     return b.url;
   }
