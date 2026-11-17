@@ -30,6 +30,7 @@ const links = [
   ["menu", "/Dashboard/Menu", "Menu"],
   ["orders", "/Dashboard/Orders", "Pesanan"],
   ["pay", "/Dashboard/Payments", "Pembayaran"],
+  ["konten", "/Dashboard/Konten", "Konten"],
 ];
 
 export function AdminNav({ on }: { on: string }) {
